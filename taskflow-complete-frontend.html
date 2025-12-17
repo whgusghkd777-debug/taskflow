@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - チーム協業を、シンプルに。</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #007AFF;
+            --secondary: #5856D6;
+            --success: #34C759;
+            --danger: #FF3B30;
+            --warning: #FF9500;
+            --bg-primary: #F5F5F7;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --border: #E5E5E7;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ナビゲーション */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0051D5;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* ヒーロー */
+        .hero {
+            text-align: center;
+            padding: 120px 24px 80px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 600;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 24px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .btn-large {
+            padding: 14px 32px;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        /* 機能カード */
+        .features {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-8px);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 24px;
+        }
+
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: var(--bg-primary);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .modal-header h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-block:hover {
+            background: #0051D5;
+        }
+
+        .btn-block:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* ダッシュボード */
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 36px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 統計カード */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card.gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        /* タスクリスト */
+        .content-section {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .task-item {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            box-shadow: var(--shadow);
+            transform: translateX(4px);
+        }
+
+        .task-info h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.todo {
+            background: #E5E5E7;
+            color: var(--text-primary);
+        }
+
+        .badge.progress {
+            background: #FFE5CC;
+            color: var(--warning);
+        }
+
+        .badge.done {
+            background: #D1F2DD;
+            color: var(--success);
+        }
+
+        .badge.high {
+            background: #FFE5E5;
+            color: var(--danger);
+        }
+
+        .badge.medium {
+            background: #FFE5CC;
+            color: var(--warning);
+        }
+
+        .badge.low {
+            background: #E5F5FF;
+            color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .alert.active {
+            display: block;
+        }
+
+        .alert.success {
+            background: #D1F2DD;
+            color: var(--success);
+        }
+
+        .alert.error {
+            background: #FFE5E5;
+            color: var(--danger);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .team-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-4px);
+        }
+
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .team-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 48px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links:not(#dashboardNav) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ナビゲーション -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="#" class="logo" onclick="goHome()">TaskFlow</a>
+            <div class="nav-links" id="mainNav">
+                <a class="nav-link" onclick="scrollTo('features')">機能</a>
+                <a class="nav-link" onclick="openModal('login')">ログイン</a>
+                <button class="btn btn-primary" onclick="openModal('signup')">今すぐ始める</button>
+            </div>
+            <div class="nav-links" id="dashboardNav" style="display: none;">
+                <span class="nav-link" id="navEmail"></span>
+                <button class="btn btn-primary" onclick="logout()">ログアウト</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ランディングページ -->
+    <div id="landingPage">
+        <section class="hero">
+            <h1>チーム協業を、<br>シンプルに。</h1>
+            <p>TaskFlowで、チームのタスク管理をもっと簡単に、もっと効率的に。</p>
+            <div class="hero-buttons">
+                <button class="btn-large btn-primary" onclick="openModal('signup')">無料で始める</button>
+                <button class="btn-large btn-secondary" onclick="scrollTo('features')">詳しく見る</button>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="feature-card">
+                <div class="feature-icon">✅</div>
+                <h3>タスク管理</h3>
+                <p>直感的なインターフェースで、タスクの作成から完了まで簡単に管理できます。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>チーム協業</h3>
+                <p>チームメンバーと簡単に情報を共有し、一緒に目標を達成しましょう。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>進捗追跡</h3>
+                <p>プロジェクトの進行状況をリアルタイムで把握できます。</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- ダッシュボード -->
+    <div class="dashboard" id="dashboardPage">
+        <div class="alert" id="alert"></div>
+
+        <div class="dashboard-header">
+            <h1>ダッシュボード</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div>
+                    <div style="font-weight: 600;" id="userName">ユーザー</div>
+                    <div style="font-size: 14px; color: var(--text-secondary);" id="userEmail">user@example.com</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('tasks')">タスク</button>
+            <button class="tab" onclick="switchTab('teams')">チーム</button>
+        </div>
+
+        <!-- タスクタブ -->
+        <div class="tab-content active" id="tasksTab">
+            <div class="stats">
+                <div class="stat-card gradient">
+                    <div class="stat-number" id="totalTasks">0</div>
+                    <div class="stat-label">全体タスク</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="todoTasks">0</div>
+                    <div class="stat-label">未着手</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="progressTasks">0</div>
+                    <div class="stat-label">進行中</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="doneTasks">0</div>
+                    <div class="stat-label">完了</div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h3 class="section-title">マイタスク</h3>
+                    <button class="btn-icon" onclick="openModal('createTask')" title="タスク作成">+</button>
+                </div>
+                <div id="taskList"></div>
+            </div>
+        </div>
+
+        <!-- チームタブ -->
+        <div class="tab-content" id="teamsTab">
+            <div class="content-section">
+                <div class="section-header">
+                    <h3 class="section-title">マイチーム</h3>
+                    <button class="btn-icon" onclick="openModal('createTeam')" title="チーム作成">+</button>
+                </div>
+                <div id="teamList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ログインモーダル -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('login')">×</button>
+            <div class="modal-header">
+                <h2>ログイン</h2>
+                <p>TaskFlowにようこそ</p>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn-block" id="loginBtn">ログイン</button>
+            </form>
+            <div style="text-align: center; margin-top: 16px; color: var(--text-secondary);">
+                アカウントをお持ちでないですか？ 
+                <a style="color: var(--primary); cursor: pointer;" onclick="switchModal('login', 'signup')">今すぐ登録</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 会員登録モーダル -->
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('signup')">×</button>
+            <div class="modal-header">
+                <h2>会員登録</h2>
+                <p>無料でTaskFlowを始めましょう</p>
+            </div>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>名前</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" id="signupPassword" minlength="8" required>
+                </div>
+                <button type="submit" class="btn-block" id="signupBtn">アカウント作成</button>
+            </form>
+            <div style="text-align: center; margin-top: 16px; color: var(--text-secondary);">
+                既にアカウントをお持ちですか？ 
+                <a style="color: var(--primary); cursor: pointer;" onclick="switchModal('signup', 'login')">ログイン</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- タスク作成モーダル -->
+    <div class="modal" id="createTaskModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('createTask')">×</button>
+            <div class="modal-header">
+                <h2>タスク作成</h2>
+            </div>
+            <form onsubmit="handleCreateTask(event)">
+                <div class="form-group">
+                    <label>タイトル</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>説明</label>
+                    <textarea id="taskDescription" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>優先度</label>
+                    <select id="taskPriority">
+                        <option value="HIGH">高</option>
+                        <option value="MEDIUM" selected>中</option>
+                        <option value="LOW">低</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>期限</label>
+                    <input type="date" id="taskDueDate">
+                </div>
+                <div class="form-group">
+                    <label>チーム</label>
+                    <select id="taskTeam" required>
+                        <option value="">チームを選択</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-block" id="createTaskBtn">作成</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- チーム作成モーダル -->
+    <div class="modal" id="createTeamModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('createTeam')">×</button>
+            <div class="modal-header">
+                <h2>チーム作成</h2>
+            </div>
+            <form onsubmit="handleCreateTeam(event)">
+                <div class="form-group">
+                    <label>チーム名</label>
+                    <input type="text" id="teamName" required>
+                </div>
+                <div class="form-group">
+                    <label>説明</label>
+                    <textarea id="teamDescription" rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn-block" id="createTeamBtn">作成</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/v1';
+        const TOKEN_KEY = 'taskflow_token';
+        const USER_KEY = 'taskflow_user';
+
+        let currentUser = null;
+        let tasks = [];
+        let teams = [];
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+
+        // 認証確認
+        function checkAuth() {
+            const token = localStorage.getItem(TOKEN_KEY);
+            const user = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
+            
+            if (token && user) {
+                currentUser = user;
+                showDashboard();
+            }
+        }
+
+        // モーダル操作
+        function openModal(type) {
+            document.getElementById(`${type}Modal`).classList.add('active');
+        }
+
+        function closeModal(type) {
+            document.getElementById(`${type}Modal`).classList.remove('active');
+        }
+
+        function switchModal(from, to) {
+            closeModal(from);
+            setTimeout(() => openModal(to), 100);
+        }
+
+        // 会員登録
+        async function handleSignup(e) {
+            e.preventDefault();
+            const btn = document.getElementById('signupBtn');
+            btn.innerHTML = '<span class="loading"></span>';
+            btn.disabled = true;
+
+            const data = {
+                name: document.getElementById('signupName').value,
+                email: document.getElementById('signupEmail').value,
+                password: document.getElementById('signupPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('会員登録成功！ログインしてください。', 'success');
+                    setTimeout(() => {
+                        switchModal('signup', 'login');
+                        document.getElementById('loginEmail').value = data.email;
+                    }, 1500);
+                } else {
+                    showAlert(result.message || '会員登録に失敗しました', 'error');
+                }
+            } catch (error) {
+                showAlert('接続エラー。サーバーが起動しているか確認してください。', 'error');
+            } finally {
+                btn.innerHTML = 'アカウント作成';
+                btn.disabled = false;
+            }
+        }
+
+        // ログイン
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.innerHTML = '<span class="loading"></span>';
+            btn.disabled = true;
+
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    localStorage.setItem(TOKEN_KEY, result.data.accessToken);
+                    
+                    const userInfo = await getUserInfo(result.data.accessToken);
+                    if (userInfo) {
+                        localStorage.setItem(USER_KEY, JSON.stringify(userInfo));
+                        currentUser = userInfo;
+                        closeModal('login');
+                        showDashboard();
+                    }
+                } else {
+                    showAlert(result.message || 'ログインに失敗しました', 'error');
+                }
+            } catch (error) {
+                showAlert('接続エラー。サーバーが起動しているか確認してください。', 'error');
+            } finally {
+                btn.innerHTML = 'ログイン';
+                btn.disabled = false;
+            }
+        }
+
+        // ユーザー情報取得
+        async function getUserInfo(token) {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                return result.success ? result.data : null;
+            } catch (error) {
+                console.error('ユーザー情報取得エラー:', error);
+                return null;
+            }
+        }
+
+        // ダッシュボード表示
+        function showDashboard() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('dashboardPage').classList.add('active');
+            document.getElementById('mainNav').style.display = 'none';
+            document.getElementById('dashboardNav').style.display = 'flex';
+            
+            document.getElementById('navEmail').textContent = currentUser.email;
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+
+            loadTasks();
+            loadTeams();
+        }
+
+        // タスク読み込み
+        async function loadTasks() {
+            const token = localStorage.getItem(TOKEN_KEY);
+            try {
+                const response = await fetch(`${API_BASE}/tasks`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    tasks = Array.isArray(result.data) ? result.data : 
+                           (result.data.content || []);
+                    displayTasks();
+                }
+            } catch (error) {
+                console.error('タスク読み込みエラー:', error);
+                tasks = [];
+                displayTasks();
+            }
+        }
+
+        // タスク表示
+        function displayTasks() {
+            const taskList = document.getElementById('taskList');
+            
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('todoTasks').textContent = 
+                tasks.filter(t => t.status === 'TODO').length;
+            document.getElementById('progressTasks').textContent = 
+                tasks.filter(t => t.status === 'IN_PROGRESS').length;
+            document.getElementById('doneTasks').textContent = 
+                tasks.filter(t => t.status === 'DONE').length;
+
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>タスクがありません</h3>
+                        <p>新しいタスクを作成して始めましょう</p>
+                    </div>
+                `;
+                return;
+            }
+
+            taskList.innerHTML = tasks.map(task => `
+                <div class="task-item">
+                    <div class="task-info">
+                        <h4>${task.title}</h4>
+                        <div class="task-meta">
+                            <span>📅 ${task.dueDate || '期限なし'}</span>
+                            <span>👤 ${task.assignee?.name || '未割り当て'}</span>
+                            <span class="badge ${getPriorityClass(task.priority)}">${getPriorityText(task.priority)}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <span class="badge ${getStatusClass(task.status)}">${getStatusText(task.status)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // チーム読み込み
+        async function loadTeams() {
+            const token = localStorage.getItem(TOKEN_KEY);
+            try {
+                const response = await fetch(`${API_BASE}/teams`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const result = await response.json();
+                if (result.success && result.data) {
+                    teams = Array.isArray(result.data) ? result.data : [];
+                    displayTeams();
+                    updateTeamSelect();
+                }
+            } catch (error) {
+                console.error('チーム読み込みエラー:', error);
+                teams = [];
+                displayTeams();
+            }
+        }
+
+        // チーム表示
+        function displayTeams() {
+            const teamList = document.getElementById('teamList');
+            
+            if (teams.length === 0) {
+                teamList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <h3>チームがありません</h3>
+                        <p>新しいチームを作成して協業を始めましょう</p>
+                    </div>
+                `;
+                return;
+            }
+
+            teamList.innerHTML = `
+                <div class="grid-2">
+                    ${teams.map(team => `
+                        <div class="team-card">
+                            <div class="team-icon">👥</div>
+                            <div class="team-header">
+                                <div>
+                                    <h4 style="font-size: 20px; margin-bottom: 8px;">${team.name}</h4>
+                                    <p style="color: var(--text-secondary);">${team.description || '説明なし'}</p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; font-size: 14px; color: var(--text-secondary);">
+                                作成者: ${team.createdBy?.name || '不明'}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // チーム選択更新
+        function updateTeamSelect() {
+            const select = document.getElementById('taskTeam');
+            select.innerHTML = '<option value="">チームを選択</option>' +
+                teams.map(team => `<option value="${team.id}">${team.name}</option>`).join('');
+        }
+
+        // タスク作成
+        async function handleCreateTask(e) {
+            e.preventDefault();
+            const btn = document.getElementById('createTaskBtn');
+            btn.innerHTML = '<span class="loading"></span>';
+            btn.disabled = true;
+
+            const data = {
+                title: document.getElementById('taskTitle').value,
+                description: document.getElementById('taskDescription').value,
+                priority: document.getElementById('taskPriority').value,
+                dueDate: document.getElementById('taskDueDate').value || null,
+                teamId: parseInt(document.getElementById('taskTeam').value)
+            };
+
+            const token = localStorage.getItem(TOKEN_KEY);
+
+            try {
+                const response = await fetch(`${API_BASE}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('タスクが作成されました！', 'success');
+                    closeModal('createTask');
+                    e.target.reset();
+                    loadTasks();
+                } else {
+                    showAlert(result.message || 'タスク作成に失敗しました', 'error');
+                }
+            } catch (error) {
+                showAlert('接続エラー', 'error');
+            } finally {
+                btn.innerHTML = '作成';
+                btn.disabled = false;
+            }
+        }
+
+        // チーム作成
+        async function handleCreateTeam(e) {
+            e.preventDefault();
+            const btn = document.getElementById('createTeamBtn');
+            btn.innerHTML = '<span class="loading"></span>';
+            btn.disabled = true;
+
+            const data = {
+                name: document.getElementById('teamName').value,
+                description: document.getElementById('teamDescription').value
+            };
+
+            const token = localStorage.getItem(TOKEN_KEY);
+
+            try {
+                const response = await fetch(`${API_BASE}/teams`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('チームが作成されました！', 'success');
+                    closeModal('createTeam');
+                    e.target.reset();
+                    loadTeams();
+                } else {
+                    showAlert(result.message || 'チーム作成に失敗しました', 'error');
+                }
+            } catch (error) {
+                showAlert('接続エラー', 'error');
+            } finally {
+                btn.innerHTML = '作成';
+                btn.disabled = false;
+            }
+        }
+
+        // タブ切り替え
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tab}Tab`).classList.add('active');
+
+            if (tab === 'tasks') loadTasks();
+            if (tab === 'teams') loadTeams();
+        }
+
+        // ログアウト
+        function logout() {
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(USER_KEY);
+            location.reload();
+        }
+
+        // ホームに戻る
+        function goHome() {
+            if (currentUser) {
+                location.reload();
+            }
+        }
+
+        // アラート表示
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type} active`;
+            setTimeout(() => alert.classList.remove('active'), 3000);
+        }
+
+        // ヘルパー関数
+        function getStatusClass(status) {
+            const map = {
+                'TODO': 'todo',
+                'IN_PROGRESS': 'progress',
+                'DONE': 'done'
+            };
+            return map[status] || 'todo';
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'TODO': '未着手',
+                'IN_PROGRESS': '進行中',
+                'DONE': '完了'
+            };
+            return map[status] || '未着手';
+        }
+
+        function getPriorityClass(priority) {
+            return (priority || 'medium').toLowerCase();
+        }
+
+        function getPriorityText(priority) {
+            const map = {
+                'HIGH': '高',
+                'MEDIUM': '中',
+                'LOW': '低'
+            };
+            return map[priority] || '中';
+        }
+
+        function scrollTo(id) {
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
